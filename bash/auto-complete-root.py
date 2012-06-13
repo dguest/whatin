@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python2.7 
 """
 usage: auto-complete-root.py <root file> [<path>]
 
@@ -9,8 +9,8 @@ in <path>.
 Author: Dan Guest <dguest@cern.ch> 
 Date: Fri Jun  8 10:44:03 CEST 2012
 """
-from tabroot import pyread
 import sys, os
+from tabroot import pyread
 
 if __name__ == '__main__': 
     file_name = sys.argv[1]
@@ -18,8 +18,10 @@ if __name__ == '__main__':
         dir_path = sys.argv[2].split('/')
     except IndexError: 
         dir_path = []
+
     items = pyread.read_file(
         root_file = file_name, 
         dir_path = dir_path)
     for subitem in items: 
         print subitem, 
+
