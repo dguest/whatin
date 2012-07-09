@@ -189,7 +189,7 @@ def getFileFrom(files_string, expand_list = None):
 
     return out_file,d_list
 
-def dumpList(stuff_list, tab_in = 0):
+def dumpList(stuff_list, tab_in = 0, terse = True):
     col_1 = tab_in
 
     col_1_widths = []
@@ -216,12 +216,15 @@ def dumpList(stuff_list, tab_in = 0):
             the_line += str(stuff[2])
 
         the_line += '\n'
-
-        out_file.write(the_line)
+        
+        if not terse or len(stuff) > 3: 
+            out_file.write(the_line)
+        elif len(stuff) < 3: 
+            out_file.write(the_line)
 
         # recursive calls
         if len(stuff) > 3:
-            inner_file = dumpList(stuff[3], tab_in = 1 + tab_in)
+            inner_file = dumpList(stuff[3], tab_in = 1 + tab_in, terse = terse)
             inner_file.seek(0)
             for inner_line in inner_file:
                 out_file.write(inner_line)
