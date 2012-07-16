@@ -32,6 +32,11 @@ def getListFrom(file_name, expand_list = []):
     return stuff_list,d
 
 def getKeysInDir(the_file, expand_list = []):
+    """
+    recursive function to return info on objects in ROOT dir
+
+    This is a mess, badly need a rewrite
+    """
     
     key_list = the_file.GetListOfKeys()
     
@@ -56,34 +61,47 @@ def getKeysInDir(the_file, expand_list = []):
         entry = [key_class, key_name]
 
         the_obj = the_key.ReadObj()
-        try:
-            obj_size = the_obj.GetEntries()
-            entry.append(obj_size)
-        except AttributeError:
-            entry.append(None)
-            pass
+
+        # grrrr suck a hack... 
+        if not expand_list or not expand_list[0]: 
+            try:
+                obj_size = the_obj.GetEntries()
+                entry.append(obj_size)
+            except AttributeError:
+                entry.append(None)
+                pass
 
         if expand_list and key_name in paths_dict:
 
             cont_path = ['/'.join(paths_dict[key_name])]
             if key_class == 'TTree':
+                obj_size = the_obj.GetEntries()
+                entry.append(obj_size)
                 entry.append(getTreeList(the_obj, cont_path))
 
             else: 
                 try: 
                     inner_stuff_list,d = getKeysInDir(the_obj,cont_path)
-                    entry.append(inner_stuff_list)
+                    if inner_stuff_list: 
+                        entry.append(len(inner_stuff_list))
+                        entry.append(inner_stuff_list)
                     d_list += d
                 except AttributeError:
                     if the_key.GetClassName() == 'TObjString': 
                         str_data = the_obj.GetString().Data()
+                        entry.append(None)
                         entry.append([[str_data,'']])
                     else:
+                        obj_size = the_obj.GetEntries()
+                        entry.append(obj_size)
                         d_list += drawHist(the_key)
                 except ReferenceError: 
                     print 'could not expand %s' % key_name
 
-        stuff_list.append(entry)
+
+        # some hack to keep lower-level directories from being included
+        if len(entry) > 2: 
+            stuff_list.append(entry)
             
     return stuff_list,d_list
 
@@ -189,7 +207,7 @@ def getFileFrom(files_string, expand_list = None):
 
     return out_file,d_list
 
-def dumpList(stuff_list, tab_in = 0, terse = True):
+def dumpList(stuff_list, tab_in = 0, terse = False):
     col_1 = tab_in
 
     col_1_widths = []
