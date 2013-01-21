@@ -27,7 +27,7 @@ _whatin()
 	fi 
         return 0
     else 
-        COMPREPLY=( $(compgen -o plusdirs -f -X "!*.root" -- ${cur}) )
+        COMPREPLY=( $(compgen -o plusdirs -f -X "!*.root*" -- ${cur}) )
 	return 0
     fi
 }
